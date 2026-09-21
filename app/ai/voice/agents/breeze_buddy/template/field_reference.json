@@ -431,10 +431,6 @@
       "description": "Whether the free-text composer is visible to the user. Default true. Set false to restrict input to quick-reply buttons only (bot-driven or menu-style flows).",
       "example": true
     },
-    "enable_try_on": {
-      "description": "Whether this merchant's shoppers can try products on their own photo. Default false: the widget shows no try-on affordance and the /try-on route refuses, so a merchant is never billed for a feature they did not ask for. Independent of the commerce catalog.",
-      "example": true
-    },
     "response_reveal": {
       "description": "How the widget reveals assistant prose. 'stream' (default) = paced typewriter as tokens arrive. 'complete' = a typing indicator while the reply is in flight, then the full message at once (Messenger style). Presentation-only: the SSE transport streams either way.",
       "example": "complete"
@@ -500,7 +496,14 @@
             "shopify"
           ],
           "features": {
-            "upsell": true
+            "upsell": true,
+            "try_on": true,
+            "show_viewed_product": true
+          },
+          "settings": {
+            "nudge_lines": [
+              "Hey, I can help you style this"
+            ]
           }
         }
       }
@@ -1232,7 +1235,17 @@
     "features": {
       "description": "Optional flavor features → on/off. OPT-IN by contract: every feature is OFF unless turned on here, so enabling a flavor never silently starts extra behaviour on an existing merchant. Commerce/ucp: 'upsell' streams a complementary ProductGrid after a successful add_to_cart — one extra LLM call plus a catalog search per add, run after the cart component is already on the wire so the shopper never waits on it.",
       "example": {
-        "upsell": true
+        "upsell": true,
+        "try_on": true,
+        "show_viewed_product": true
+      }
+    },
+    "settings": {
+      "description": "How a switched-on feature behaves, for the cases a bool cannot express \u2014 copy, limits, labels. Separate from `features` because that map is the on/off contract and stays typed as booleans; a setting here does nothing unless its feature is on, and every key has a compiled-in default, so omitting the map is always safe. Opaque to the engine like the rest of this block: the flavor that owns the protocol reads its own keys and ignores any it does not know. Commerce/ucp: 'nudge_lines' (up to two strings) replaces the show_viewed_product bubble copy.",
+      "example": {
+        "nudge_lines": [
+          "Hey, I can help you style this"
+        ]
       }
     }
   }

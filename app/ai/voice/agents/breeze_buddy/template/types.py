@@ -1430,7 +1430,23 @@ class FlavorProtocolConfig(BaseModel):
             "merchant. Commerce/ucp: 'upsell' streams a complementary "
             "ProductGrid after a successful add_to_cart (one extra LLM "
             "call + catalog search per add, run after the cart is already "
-            "on the wire)."
+            "on the wire); 'try_on' lets shoppers try a product on their "
+            "own photo (bills per generation); 'show_viewed_product' opens "
+            "the panel on a storefront product page with that product."
+        ),
+    )
+    settings: Dict[str, Any] = Field(
+        default_factory=dict,
+        description=(
+            "How a switched-on feature behaves, where a bool cannot say it "
+            "— copy, limits, labels. Separate from `features` because that "
+            "map is the on/off contract and stays typed as booleans; a "
+            "setting here does nothing unless its feature is on, and every "
+            "key has a compiled-in default, so omitting the map is always "
+            "safe. Opaque to the engine like the rest of this block: the "
+            "flavor that owns the protocol reads its own keys and ignores "
+            "any it does not know. Commerce/ucp: 'nudge_lines' (list of "
+            "strings) replaces the show_viewed_product bubble copy."
         ),
     )
 
@@ -2183,15 +2199,6 @@ class ConfigurationModel(BaseModel):
             "True (default) = composer visible; user can type freely. "
             "False = composer hidden for all turns; only quick replies or "
             "agent-driven input is possible."
-        ),
-    )
-    enable_try_on: bool = Field(
-        False,
-        description=(
-            "Whether this merchant's shoppers can try products on their own "
-            "photo. False (default) = no affordance and the /try-on route "
-            "refuses, so a new merchant is never billed for a feature they "
-            "did not ask for. Independent of the commerce catalog."
         ),
     )
     response_reveal: Literal["stream", "complete"] = Field(
